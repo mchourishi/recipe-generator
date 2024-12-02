@@ -1,0 +1,27 @@
+services:
+  app:
+    build: . # Builds the Flask app using the Dockerfile in the current directory.
+    container_name: recipes_generator_app
+    environment:
+      - FLASK_APP=${FLASK_APP}
+      - FLASK_ENV=${FLASK_ENV}
+      - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI}
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db #  Ensures that the Flask app waits for the Postgres container to be ready before starting.
+    volumes:
+      - .:/app # Mounts the local directory (.) to /app in the container to ensure code changes are reflected without rebuilding the container.
+  db:
+    image: postgres:13
+    container_name: recipes_generator_db
+    environment:
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_DB=${DATABASE_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+volumes:
+  postgres_data: # The volume postgres_data ensures that the Postgres data persists between restarts
